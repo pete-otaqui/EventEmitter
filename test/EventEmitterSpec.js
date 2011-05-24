@@ -9,6 +9,7 @@ describe("EventEmitter", function() {
     
     beforeEach(function() {
         tempVar = '';
+        
         simpleObject = {
             hideMe : function() {
                 this.trigger('hidden', {source:this})
@@ -21,6 +22,9 @@ describe("EventEmitter", function() {
         EventEmitter.augment(exampleKlass.prototype);
         exampleKlass.prototype.showMe = function() {
             this.trigger('shown', {source:this, someProp:'someVal'});
+        };
+        exampleKlass.prototype.countMe = function() {
+            this.trigger('count', {source:this});
         };
         
         exampleCallback = function(e) {tempVar = 'exampleCallback'};
@@ -92,6 +96,17 @@ describe("EventEmitter", function() {
         }
         exampleInstance.on('shown', tempCallback);
         exampleInstance.showMe();
+    });
+    
+    it('should only fire callbacks bound with once() a single time', function() {
+        var t1 = 0;
+        var tempCallback = function(e) {
+            t1++;
+            expect(t1).toBe(1);
+        }
+        exampleInstance.once('count', tempCallback);
+        exampleInstance.countMe();
+        exampleInstance.countMe();
     });
 
 });
